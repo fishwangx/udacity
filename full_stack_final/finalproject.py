@@ -108,17 +108,32 @@ def deleteRestaurantMenu(restaurant_id,menu_id):
     myMenu = session.query(MenuItem).filter_by(id=menu_id).one()
     myRestaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
     if request.method=='POST':
-        pass
+        session.delete(myMenu)
+        session.commit()
+        return redirect(url_for('listRestaurantMenu',restaurant_id = restaurant_id))
+
         
     else:
 
 
-        return render_template("deleterestaurantsmenus.html")
+        return render_template("deleterestaurantsmenus.html",restaurant=myRestaurant,menu=myMenu)
 
-@app.route('/restaurants/<int:restaurant_id>/create')
-def createRestaurantMenu(restaurant_id,menu_id):
+@app.route('/restaurants/<int:restaurant_id>/create',methods=['GET','POST'])
+def createRestaurantMenu(restaurant_id):
+    if request.method=='POST':
+         DBSession = sessionmaker(bind=engine)
+         session = DBSession()
+         myMenu = MenuItem(name=request.form['name'],restaurant_id=restaurant_id,price="$9.99",description="Welld one!")
+         session.add(myMenu)
+         session.commit()
 
-    return "Create a menu in a restaurant."
+
+         return redirect(url_for('listRestaurantMenu',restaurant_id = restaurant_id))
+    else:
+        return render_template('createrestaurantsmenus.html',restaurant_id=restaurant_id)
+
+
+
 
 
 if __name__ =="__main__":
